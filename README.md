@@ -1,1 +1,1 @@
-# noophowo
+# noophowo - noob photographer workflows
