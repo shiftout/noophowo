@@ -46,8 +46,27 @@ def remove_orphan_raw_files(jpg_dir, raw_dir):
             os.remove(file)
             cnt += 1
     
-    return cnt  
+    return cnt
 
+def archive_conveted_raw_files(conv_jpg_dir, raw_dir):
+    conv_jpgsnames = set()
+    for file in get_jpg_files(conv_jpg_dir):
+        base = os.path.basename(file)
+        conv_jpgsnames.add(base.split('.')[0])
+    
+    cnt = 0
+    for file in get_cr2_files(raw_dir):
+        base = os.path.basename(file)
+        if base.split('.')[0] in conv_jpgsnames:
+            dest_file = os.path.join(conv_jpg_dir, base)
+            if os.path.exists(dest_file):
+                os.remove(dest_file)
+            
+            os.rename(file, dest_file)
+            cnt += 1
+
+    return cnt
+    
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--path', help= 'path to a JPG/JPEG directory')
@@ -72,6 +91,10 @@ def main():
     
     print("{} raw files moved".format(move_raw_files(cwd, raw_dir)))
     print("{} orphan raw files removed".format(remove_orphan_raw_files(cwd, raw_dir)))
+
+    converted_raw_dir = os.path.join(raw_dir, "converted")
+    if os.path.exists(converted_raw_dir):
+        print("{} converted raw files archived".format(archive_conveted_raw_files(converted_raw_dir, raw_dir)))
 
 if __name__ == "__main__":
     main()
